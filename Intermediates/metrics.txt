@@ -1,0 +1,14 @@
+Total trajectories: 3459
+Total sequences: 126295
+Average sequences per trajectory: 36.51199768719283
+Max sequences in trajectory: 169
+Min sequences in trajectory: 0
+
+Trajectories under 10 sequences: 9
+Trajectories under 50 sequences: 3260
+Trajectories under 65 sequences: 3434
+Trajectories under 75 sequences: 3453
+Trajectories under 100 sequences: 3458
+Trajectories under 125 sequences: 3458
+Trajectories under 150 sequences: 3458
+Trajectories under max sequences: 3458
