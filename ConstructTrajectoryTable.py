@@ -2,7 +2,7 @@ import pandas as pd
 
 df = pd.read_csv("Intermediates/droppedFires.csv")
 
-tableColumns = ["Start Time", "End Time", "TargetRotX", "TargetRotY"]
+tableColumns = ["Start Time", "End Time", "SequenceSize", "TargetRotX", "TargetRotY"]
 for i in range(64):
     tableColumns.append("PlayerRotX" + str(i))
     tableColumns.append("PlayerRotY" + str(i))
@@ -15,10 +15,11 @@ for index, _ in chunkSizes.iterrows():
     size = chunkSizes.iat[index, 0]
     chunk = df.iloc[chunkIndex:chunkIndex + size]
     chunkIndex += size
-    
+
     newFrameList = []
     newFrameList.append(chunk.iloc[0, 0])
     newFrameList.append(chunk.iloc[size - 1, 0])
+    newFrameList.append(size)
     newFrameList.append(chunk.iloc[0, 3])
     newFrameList.append(chunk.iloc[0, 4])
 
