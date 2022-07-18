@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import numpy as np
 
 file_list = []
 fl = os.listdir("OriginalData")
