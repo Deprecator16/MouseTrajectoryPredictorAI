@@ -19,7 +19,7 @@ for index, row in df.iterrows():
                     min = sequencesPerTrajectory[trajectoryIndex]
             trajectoryIndex += 1
             sequencesPerTrajectory.append(0)
-        elif index + 1 < numRows and not isnan(row.iat[3]):
+        elif index + 1 < numRows and not isnan(df.iat[index + 1, 3]):
             if trajectoryIndex >= 0 and trajectoryIndex < numRows:
                 if sequencesPerTrajectory[trajectoryIndex] > max:
                     max = sequencesPerTrajectory[trajectoryIndex]
@@ -41,6 +41,8 @@ fw.write("Max sequences in trajectory: {}\n".format(max))
 fw.write("Min sequences in trajectory: {}\n\n".format(min))
 
 under10 = sum(1 for e in sequencesPerTrajectory if e < 10)
+under32 = sum(1 for e in sequencesPerTrajectory if e < 32)
+under48 = sum(1 for e in sequencesPerTrajectory if e < 48)
 under50 = sum(1 for e in sequencesPerTrajectory if e < 50)
 under65 = sum(1 for e in sequencesPerTrajectory if e < 65)
 under75 = sum(1 for e in sequencesPerTrajectory if e < 75)
@@ -51,6 +53,8 @@ under150 = sum(1 for e in sequencesPerTrajectory if e < 150)
 underMax = sum(1 for e in sequencesPerTrajectory if e < max)
 
 fw.write("Trajectories under 10 sequences: {}\n".format(under10))
+fw.write("Trajectories under 32 sequences: {}\n".format(under32))
+fw.write("Trajectories under 48 sequences: {}\n".format(under48))
 fw.write("Trajectories under 50 sequences: {}\n".format(under50))
 fw.write("Trajectories under 65 sequences: {}\n".format(under65))
 fw.write("Trajectories under 75 sequences: {}\n".format(under75))
@@ -61,6 +65,7 @@ fw.write("Trajectories under max sequences: {}\n".format(underMax))
 fw.close()
 
 st = open("Intermediates/sequencesPerTrajectory.csv", "a")
+st.write("TrajectorySize\n")
 for e in sequencesPerTrajectory:
-    st.write("{},\n".format(e))
+    st.write("{}\n".format(e))
 st.close()
