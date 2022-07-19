@@ -13,7 +13,7 @@ for index, row in df.iterrows():
             zeroAngle = (row.iat[1], row.iat[2])
             df.iat[index, 1] = 0.0
             df.iat[index, 2] = 0.0
-            targetAngle = (df.iat[index + 1, 3], df.iat[index + 1, 4])
+            targetAngle = (df.iat[index + 1, 3] - zeroAngle[0], df.iat[index + 1, 4] - zeroAngle[1])
         else:
             nextZeroAngle = (row.iat[1], row.iat[2])
             df.iat[index, 1] -= zeroAngle[0]
@@ -23,7 +23,7 @@ for index, row in df.iterrows():
             zeroAngle = nextZeroAngle
 
             if index + 1 < numRows and not isnan(row.iat[3]):
-                targetAngle = (df.iat[index + 1, 3], df.iat[index + 1, 4])
+                targetAngle = (df.iat[index + 1, 3] - zeroAngle[0], df.iat[index + 1, 4] - zeroAngle[1])
     else:
         nextZeroAngle = (row.iat[1], row.iat[2])
         df.iat[index, 1] -= zeroAngle[0]
