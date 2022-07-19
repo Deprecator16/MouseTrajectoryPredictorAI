@@ -44,18 +44,26 @@ for index, row in outTesting.iterrows():
     outputTesting[index] = conc
 
 model = Sequential()
-model.add(Conv1D(filters=64, kernel_size=8, input_shape=(64,2), activation="relu"))
-model.add(Conv1D(filters=128, kernel_size=5, activation="relu"))
-model.add(Conv1D(filters=64, kernel_size=3, activation="relu"))
+model.add(Conv1D(filters=64, kernel_size=8, input_shape=(64,2), padding='same',activation="relu"))
+model.add(Conv1D(filters=128, kernel_size=5, padding='same', activation="relu"))
+model.add(Conv1D(filters=64, kernel_size=3, padding='same', activation="relu"))
 model.add(GlobalAveragePooling1D())
 model.add(Reshape((64,1)))
-model.add(Conv1D(filters=64, kernel_size=3, activation="relu"))
-model.add(Conv1D(filters=128, kernel_size=5, activation="relu"))
-model.add(Conv1D(filters=2, kernel_size=8))
+model.add(Conv1D(filters=64, kernel_size=3, padding='same', activation="relu"))
+model.add(Conv1D(filters=128, kernel_size=5, padding='same', activation="relu"))
+model.add(Conv1D(filters=2, kernel_size=3, padding='same'))
 
-print(model.output_shape)
+# print(model.output_shape)
 
-# model.compile(loss='mean_squared_error', optimizer='adam', metrics=['mse', 'mae'])
-# model.fit(inputTraining, outputTraining, batch_size=32, epochs=100, verbose=1)
-# score = model.evaluate(inputTesting, outputTesting, verbose=1)
-# print(score)
+model.compile(loss='mean_squared_error', optimizer='adam', metrics=['mse', 'mae'])
+model.fit(inputTraining, outputTraining, batch_size=32, epochs=100, verbose=1)
+score = model.evaluate(inputTesting, outputTesting, verbose=1)
+print(score)
+
+# predictions = model.predict(inputTesting)
+# np.savetxt("predictionTesting0.csv", predictions[0], delimiter=',')
+# np.savetxt("predictionTesting1.csv", predictions[1], delimiter=',')
+# np.savetxt("predictionTesting2.csv", predictions[2], delimiter=',')
+# np.savetxt("predictionTesting3.csv", predictions[3], delimiter=',')
+# np.savetxt("predictionTesting4.csv", predictions[4], delimiter=',')
+
