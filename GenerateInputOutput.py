@@ -1,5 +1,7 @@
 import pandas as pd
 
+percentageSplit = 0.6
+
 outputData = pd.read_csv("Intermediates/trajectoryTable.csv")
 outputData.drop(columns=["Start Time", "End Time", "SequenceSize"], inplace=True)
 
@@ -9,10 +11,12 @@ inputData.to_csv("Intermediates/inputData.csv", index=False)
 outputData.drop(columns=["TargetRotX", "TargetRotY"], inplace=True)
 outputData.to_csv("Intermediates/outputData.csv", index=False)
 
-inputTrainingData = inputData[::2].copy()
-inputTestingData = inputData[1::2].copy()
-outputTrainingData = outputData[::2].copy()
-outputTestingData = outputData[1::2].copy()
+numRows = len(outputData.index)
+splitPoint = int(numRows * 0.6)
+inputTrainingData = inputData[:splitPoint].copy()
+inputTestingData = inputData[splitPoint:].copy()
+outputTrainingData = outputData[:splitPoint].copy()
+outputTestingData = outputData[splitPoint:].copy()
 
 inputTrainingData.to_csv("CleanedData/inputTrainingData.csv", index=False)
 inputTestingData.to_csv("CleanedData/inputTestingData.csv", index=False)
