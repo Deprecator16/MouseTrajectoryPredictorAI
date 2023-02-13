@@ -3,6 +3,13 @@ import sys
 import numpy as np
 import pandas as pd
 
+#----------------------------------------
+# Parameters for what files will be output from running this script
+#----------------------------------------
+trainingSplit = 0.6         # Percentage of data which will be used for training. The rest will go to testing
+outputIntermediates = False # Output intermediate stages into files
+outputMetrics = False       # Output metrics on data
+
 ####################
 # Gather all raw mouse data into one dataframe
 ####################
@@ -10,6 +17,9 @@ gatheredFrame = pd.DataFrame()
 for file in os.listdir("OriginalData"):
   if file.endswith('.csv'):
     gatheredFrame = pd.concat([gatheredFrame, pd.read_csv("OriginalData\\" + file)], ignore_index=True)
+
+if outputIntermediates:
+    gatheredFrame.to_csv('Intermediates/gathered.csv', index=False)
 
 ####################
 # Calculate the deltas in the angles (Difference in pitch with respect to time, and difference in yaw with respect to time)
@@ -41,6 +51,9 @@ for index, row in gatheredFrame.iterrows():
         gatheredFrame.iat[index, 3] = targetAngle[0]
         gatheredFrame.iat[index, 4] = targetAngle[1]
         zeroAngle = nextZeroAngle
+
+if outputIntermediates:
+    gatheredFrame.to_csv('Intermediates/deltaTransformed.csv', index=False)
 
 ####################
 # Extract metrics/information about the dataset. The important list that is generated here is sequencesPerTrajectory.csv.
@@ -74,18 +87,19 @@ for index, row in gatheredFrame.iterrows():
 sequencesTotal = sum(sequencesPerTrajectory)
 trajectoryAverage = sequencesTotal / (trajectoryIndex + 1)
 
-with open("Intermediates/metrics.txt", "a") as fw:
-    fw.truncate(0)
-    fw.write("Total trajectories: {}\n".format(trajectoryIndex + 1))
-    fw.write("Total sequences: {}\n".format(sequencesTotal))
-    fw.write("Average sequences per trajectory: {}\n".format(trajectoryAverage))
-    fw.write("Max sequences in trajectory: {}\n".format(max))
-    fw.write("Min sequences in trajectory: {}\n\n".format(min))
+if outputMetrics:
+    with open("Intermediates/metrics.txt", "a") as fw:
+        fw.truncate(0)
+        fw.write("Total trajectories: {}\n".format(trajectoryIndex + 1))
+        fw.write("Total sequences: {}\n".format(sequencesTotal))
+        fw.write("Average sequences per trajectory: {}\n".format(trajectoryAverage))
+        fw.write("Max sequences in trajectory: {}\n".format(max))
+        fw.write("Min sequences in trajectory: {}\n\n".format(min))
 
-    underSeq = [10, 32, 48, 50, 65, 75, 100, 125, 150, max]
-    for i in range(len(underSeq)):
-        under = sum(1 for e in sequencesPerTrajectory if e < underSeq[i])
-        fw.write("Trajectories under {} sequences: {}\n".format("max" if i == len(underSeq) - 1 else underSeq[i], under))
+        underSeq = [10, 32, 48, 50, 65, 75, 100, 125, 150, max]
+        for i in range(len(underSeq)):
+            under = sum(1 for e in sequencesPerTrajectory if e < underSeq[i])
+            fw.write("Trajectories under {} sequences: {}\n".format("max" if i == len(underSeq) - 1 else underSeq[i], under))
 
 with open("Intermediates/sequencesPerTrajectory.csv", "a") as st:
     st.truncate(0)
@@ -99,6 +113,9 @@ with open("Intermediates/sequencesPerTrajectory.csv", "a") as st:
 indicesToRemove = gatheredFrame[gatheredFrame["Fired"] == True].index
 gatheredFrame.drop(indicesToRemove, inplace=True)
 gatheredFrame.drop(columns=["Fired", "HitTarget"], inplace=True)
+
+if outputIntermediates:
+    gatheredFrame.to_csv("Intermediates/droppedFires.csv", index=False)
 
 ####################
 # Extract every trajectory from droppedFires.csv and flatten it out into one row. Every row represents one trajectory.
@@ -135,22 +152,24 @@ for index, _ in chunkSizes.iterrows():
     dfAppendList.append(newFrameList)
 
 outputData = pd.DataFrame(dfAppendList, columns=tableColumns)
+if outputIntermediates:
+    outputData.to_csv("Intermediates/trajectoryTable.csv", index=False)
 
 ####################
 # Separate the trajectories into input training, input testing, output training, and output testing datasets
 ####################
-percentageSplit = 0.6
-
 outputData.drop(columns=["Start Time", "End Time", "SequenceSize"], inplace=True)
 
 inputData = outputData[outputData.columns[0:2]].copy()
-inputData.to_csv("Intermediates/inputData.csv", index=False)
+if outputIntermediates:
+    inputData.to_csv("Intermediates/inputData.csv", index=False)
 
 outputData.drop(columns=["TargetRotX", "TargetRotY"], inplace=True)
-outputData.to_csv("Intermediates/outputData.csv", index=False)
+if outputIntermediates:
+    outputData.to_csv("Intermediates/outputData.csv", index=False)
 
 numRows = len(outputData.index)
-splitPoint = int(numRows * percentageSplit)
+splitPoint = int(numRows * trainingSplit)
 inputTrainingData = inputData[:splitPoint].copy()
 inputTestingData = inputData[splitPoint:].copy()
 outputTrainingData = outputData[:splitPoint].copy()
